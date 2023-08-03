@@ -1,12 +1,13 @@
 {
   "name": "@backstage/plugin-scaffolder",
   "description": "The Backstage plugin that helps you create new things",
-  "version": "1.14.2-next.1",
+  "version": "1.15.0-fh",
   "main": "src/index.ts",
   "types": "src/index.ts",
   "license": "Apache-2.0",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://artifactory.prod.flatiron.io/artifactory/api/npm/npm/"
   },
   "exports": {
     ".": "./src/index.ts",

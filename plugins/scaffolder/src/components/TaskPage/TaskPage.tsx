@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { parseEntityRef } from '@backstage/catalog-model';
 import {
   Content,
   ErrorPage,
@@ -23,11 +22,7 @@ import {
   Page,
   Progress,
 } from '@backstage/core-components';
-import {
-  useApi,
-  useRouteRef,
-  useRouteRefParams,
-} from '@backstage/core-plugin-api';
+import { useApi, useRouteRefParams } from '@backstage/core-plugin-api';
 import { BackstageTheme } from '@backstage/theme';
 import {
   Button,
@@ -47,9 +42,7 @@ import Check from '@material-ui/icons/Check';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import classNames from 'classnames';
 import { DateTime, Interval } from 'luxon';
-import qs from 'qs';
 import React, { memo, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import useInterval from 'react-use/lib/useInterval';
 import {
   ScaffolderTaskStatus,
@@ -58,11 +51,7 @@ import {
 } from '@backstage/plugin-scaffolder-react';
 import { TaskErrors } from './TaskErrors';
 import { TaskPageLinks } from './TaskPageLinks';
-import {
-  rootRouteRef,
-  scaffolderTaskRouteRef,
-  selectedTemplateRouteRef,
-} from '../../routes';
+import { scaffolderTaskRouteRef } from '../../routes';
 import { scaffolderApiRef } from '@backstage/plugin-scaffolder-react';
 
 // typings are wrong for this library, so fallback to not parsing types.
@@ -251,10 +240,7 @@ export type TaskPageProps = {
 export const TaskPage = (props: TaskPageProps) => {
   const { loadingText } = props;
   const classes = useStyles();
-  const navigate = useNavigate();
-  const rootPath = useRouteRef(rootRouteRef);
   const scaffolderApi = useApi(scaffolderApiRef);
-  const templateRoute = useRouteRef(selectedTemplateRouteRef);
   const [userSelectedStepId, setUserSelectedStepId] = useState<
     string | undefined
   >(undefined);
@@ -306,25 +292,6 @@ export const TaskPage = (props: TaskPageProps) => {
 
   const { output } = taskStream;
 
-  const handleStartOver = () => {
-    if (!taskStream.task || !taskStream.task?.spec.templateInfo?.entityRef) {
-      navigate(rootPath());
-      return;
-    }
-
-    const formData = taskStream.task!.spec.parameters;
-
-    const { name, namespace } = parseEntityRef(
-      taskStream.task!.spec.templateInfo?.entityRef,
-    );
-
-    navigate(
-      `${templateRoute({ templateName: name, namespace })}?${qs.stringify({
-        formData: JSON.stringify(formData),
-      })}`,
-    );
-  };
-
   const handleCancel = async () => {
     setClickedToCancel(true);
     await scaffolderApi.cancelTask(taskId);
@@ -357,15 +324,6 @@ export const TaskPage = (props: TaskPageProps) => {
                   {output && hasLinks(output) && (
                     <TaskPageLinks output={output} />
                   )}
-                  <Button
-                    className={classes.button}
-                    onClick={handleStartOver}
-                    disabled={!completed}
-                    variant="contained"
-                    color="primary"
-                  >
-                    Start Over
-                  </Button>
                   <Button
                     className={classes.button}
                     onClick={handleCancel}
